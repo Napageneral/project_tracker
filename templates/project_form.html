@@ -499,13 +499,16 @@
 </div>
 
 <script>
+    const stageOrder = ['CONCEPT', 'DESIGN', 'MODELING', 'PROTOTYPE', 'CONTRACT', 'PRODUCTION', 'LAUNCHED', 'COMPLETED', 'CANCELLED'];
+    
     function updateVisibleSections() {
         const currentStage = document.getElementById('current_stage').value;
+        const currentStageIndex = stageOrder.indexOf(currentStage);
         const sections = document.querySelectorAll('.card[data-stage]');
         
         sections.forEach(section => {
-            const stages = section.getAttribute('data-stage').split(',');
-            if (stages.includes('all') || stages.includes(currentStage)) {
+            const sectionStage = section.getAttribute('data-stage');
+            if (sectionStage === 'all' || stageOrder.indexOf(sectionStage) <= currentStageIndex) {
                 section.style.display = 'block';
             } else {
                 section.style.display = 'none';
@@ -514,7 +517,12 @@
     }
     
     // Call the function on page load
-    document.addEventListener('DOMContentLoaded', updateVisibleSections);
-</script>
+    document.addEventListener('DOMContentLoaded', function() {
+        updateVisibleSections();
+        
+        // Add event listener to the stage select element
+        document.getElementById('current_stage').addEventListener('change', updateVisibleSections);
+    });
+    </script>
 
 {% endblock %}
