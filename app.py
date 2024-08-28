@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
 from werkzeug.utils import secure_filename
 from database import init_db, db_session
 from models import CustomerService, Launch, Project, Communication, Design, Modeling, Prototype, ProductPictures, Contract, Production, Packaging, Freight, Shipping, File, Tooling
@@ -36,6 +36,12 @@ def save_files(files, parent_id, parent_type):
             saved_files.append(new_file)
     return saved_files
 
+def get_project_or_404(project_id):
+    project = Project.query.get(project_id)
+    if project is None:
+        abort(404, description="Project not found")
+    return project
+
 # Helper function to safely convert string to date
 def safe_date(date_string):
     return safe_date(date_string, '%Y-%m-%d').date() if date_string else None
@@ -46,7 +52,7 @@ def safe_float(float_string):
 
 # Helper function to safely convert string to int
 def safe_int(int_string):
-    returnsafe_int(int_string) if int_string else None
+    return safe_int(int_string) if int_string else None
 
 @app.before_first_request
 def initialize_database():
@@ -70,11 +76,6 @@ def unhandled_exception(e):
 def dashboard():
     projects = Project.query.all()
     return render_template('dashboard.html', projects=projects)
-
-@app.route('/project/<int:project_id>')
-def project_detail(project_id):
-    project = Project.query.get_or_404(project_id)
-    return render_template('project_detail.html', project=project)
 
 @app.route('/project/new', methods=['GET', 'POST'])
 def new_project():
@@ -288,7 +289,7 @@ def new_project():
 
 @app.route('/project/<int:project_id>/edit', methods=['GET', 'POST'])
 def edit_project(project_id):
-    project = Project.query.get_or_404(project_id)
+    project = get_project_or_404(project_id)
     if request.method == 'POST':
         # Update main project details
         project.creator_name = request.form['creator_name']
@@ -454,6 +455,51 @@ def edit_project(project_id):
         db_session.commit()
         return redirect(url_for('project_detail', project_id=project.id))
     return render_template('project_form.html', project=project)
+
+@app.route('/project/<int:project_id>/delete', methods=['POST'])
+def delete_project(project_id):
+    try:
+        project = get_project_or_404(project_id)
+        
+        # Manually delete associated files and records
+        associated_models = [
+            (Communication, 'communication_id'),
+            (Design, 'design_id'),
+            (Modeling, 'modeling_id'),
+            (Prototype, 'prototype_id'),
+            (ProductPictures, 'product_pictures_id'),
+            (Contract, 'contract_id'),
+            (Tooling, 'tooling_id'),
+            (Production, 'production_id'),
+            (Packaging, 'packaging_id'),
+            (Launch, 'launch_id'),
+            (CustomerService, 'customer_service_id'),
+            (Freight, 'freight_id'),
+            (Shipping, 'shipping_id')
+        ]
+
+        for model, id_column in associated_models:
+            associated_record = model.query.filter_by(project_id=project_id).first()
+            if associated_record:
+                # Delete associated files
+                associated_files = File.query.filter_by(**{id_column: associated_record.id}).all()
+                for file in associated_files:
+                    if os.path.exists(file.file_path):
+                        os.remove(file.file_path)
+                    db_session.delete(file)
+                
+                # Delete the associated record
+                db_session.delete(associated_record)
+
+        # Delete the project
+        db_session.delete(project)
+        db_session.commit()
+        
+        return jsonify({"success": True, "message": "Project deleted successfully"}), 200
+    except Exception as e:
+        db_session.rollback()
+        logger.error(f"Error deleting project: {str(e)}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
