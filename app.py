@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort, make_response
 from werkzeug.utils import secure_filename
 from database import init_db, db_session
 from models import CustomerService, Launch, Project, Communication, Design, Modeling, Prototype, ProductPictures, Contract, Production, Packaging, Freight, Shipping, File, Tooling
@@ -30,9 +30,25 @@ def save_files(files, parent_id, parent_type):
                 upload_date=datetime.now(),
                 file_type=file.filename.rsplit('.', 1)[1].lower()
             )
-            if parent_type == 'launch':
+            if parent_type == 'design':
+                new_file.design_id = parent_id
+            elif parent_type == 'modeling':
+                new_file.modeling_id = parent_id
+            elif parent_type == 'prototype':
+                new_file.prototype_id = parent_id
+            elif parent_type == 'product_pictures':
+                new_file.product_pictures_id = parent_id
+            elif parent_type == 'contract':
+                new_file.contract_id = parent_id
+            elif parent_type == 'tooling':
+                new_file.tooling_id = parent_id
+            elif parent_type == 'production':
+                new_file.production_id = parent_id
+            elif parent_type == 'packaging':
+                new_file.packaging_id = parent_id
+            elif parent_type == 'launch':
                 new_file.launch_id = parent_id
-            # Add other conditions for other parent types if needed
+            
             saved_files.append(new_file)
     return saved_files
 
@@ -89,6 +105,10 @@ def dashboard():
     projects = Project.query.all()
     return render_template('dashboard.html', projects=projects)
 
+@app.route('/favicon.ico')
+def favicon():
+    return make_response('', 204)
+
 @app.route('/project/new', methods=['GET', 'POST'])
 def new_project():
     if request.method == 'POST':
@@ -135,160 +155,160 @@ def new_project():
             logger.debug("Communication object added")
             communication.files = save_files(request.files.getlist('communication_files'), communication.id, 'communication')
 
-            if project.current_stage == 'CONCEPT':
-                design = Design(
-                    project_id=project.id,
-                    start_date=safe_date(request.form['design_start_date']),
-                    end_date=safe_date(request.form['design_end_date']),
-                    cost=safe_float(request.form['design_cost']),
-                    artist=request.form['design_artist']
-                )
-                db_session.add(design)
-                logger.debug("Design object added")
-                design.files = save_files(request.files.getlist('design_files'), design.id, 'design')
 
-            if project.current_stage == 'MODELING':
-                modeling = Modeling(
-                    project_id=project.id,
-                    start_date=safe_date(request.form['modeling_start_date']),
-                    end_date=safe_date(request.form['modeling_end_date']),
-                    cost=safe_float(request.form['modeling_cost']),
-                    artist=request.form['modeling_artist']
-                )
-                db_session.add(modeling)
-                db_session.flush()
-                modeling.files = save_files(request.files.getlist('modeling_files'), modeling.id, 'modeling')
-                db_session.add_all(modeling.files)
-                logger.debug("Modeling object added")
+            design = Design(
+                project_id=project.id,
+                start_date=safe_date(request.form['design_start_date']),
+                end_date=safe_date(request.form['design_end_date']),
+                cost=safe_float(request.form['design_cost']),
+                artist=request.form['design_artist']
+            )
+            db_session.add(design)
+            logger.debug("Design object added")
+            design.files = save_files(request.files.getlist('design_files'), design.id, 'design')
 
-            if project.current_stage == 'PROTOTYPE':
-                prototype = Prototype(
-                    project_id=project.id,
-                    start_date=safe_date(request.form['prototype_start_date']),
-                    end_date=safe_date(request.form['prototype_end_date']),
-                    cost=safe_float(request.form['prototype_cost']),
-                    num_exploded_pieces=safe_int(request.form['num_exploded_pieces']),
-                    shipped_date=safe_date(request.form['prototype_shipped_date']),
-                    dimensions_height=safe_float(request.form['prototype_dimensions_height']),
-                    dimensions_length=safe_float(request.form['prototype_dimensions_length']),
-                    dimensions_depth=safe_float(request.form['prototype_dimensions_depth']),
-                    weight=safe_float(request.form['prototype_weight']),
-                )
-                db_session.add(prototype)
-                prototype.files = save_files(request.files.getlist('prototype_files'), prototype.id, 'prototype')
-                logger.debug("Prototype object added")
+        
+            modeling = Modeling(
+                project_id=project.id,
+                start_date=safe_date(request.form['modeling_start_date']),
+                end_date=safe_date(request.form['modeling_end_date']),
+                cost=safe_float(request.form['modeling_cost']),
+                artist=request.form['modeling_artist']
+            )
+            db_session.add(modeling)
+            db_session.flush()
+            modeling.files = save_files(request.files.getlist('modeling_files'), modeling.id, 'modeling')
+            db_session.add_all(modeling.files)
+            logger.debug("Modeling object added")
 
 
-            if project.current_stage == 'PROTOTYPE':
-                product_pictures = ProductPictures(
-                    project_id=project.id,
-                    start_date=safe_date(request.form['product_pictures_start_date']),
-                    end_date=safe_date(request.form['product_pictures_end_date']),
-                    cost=safe_float(request.form['product_pictures_cost'])
-                )
-                db_session.add(product_pictures)
-                product_pictures.files = save_files(request.files.getlist('product_pictures_files'), product_pictures.id, 'product_pictures')
-                logger.debug("Product Pictures object added")
+            prototype = Prototype(
+                project_id=project.id,
+                start_date=safe_date(request.form['prototype_start_date']),
+                end_date=safe_date(request.form['prototype_end_date']),
+                cost=safe_float(request.form['prototype_cost']),
+                num_exploded_pieces=safe_int(request.form['num_exploded_pieces']),
+                shipped_date=safe_date(request.form['prototype_shipped_date']),
+                dimensions_height=safe_float(request.form['prototype_dimensions_height']),
+                dimensions_length=safe_float(request.form['prototype_dimensions_length']),
+                dimensions_depth=safe_float(request.form['prototype_dimensions_depth']),
+                weight=safe_float(request.form['prototype_weight']),
+            )
+            db_session.add(prototype)
+            prototype.files = save_files(request.files.getlist('prototype_files'), prototype.id, 'prototype')
+            logger.debug("Prototype object added")
 
-            if project.current_stage == 'CONTRACT':
-                contract = Contract(
-                    project_id=project.id,
-                    sent_date=safe_date(request.form['contract_sent_date']),
-                    signed_date=safe_date(request.form['contract_signed_date']),
-                )
-                db_session.add(contract)
-                contract.files = save_files(request.files.getlist('contract_files'), contract.id, 'contract')
-                logger.debug("Contract object added")
 
-            if project.current_stage == 'CONTRACT':
-                tooling = Tooling(
-                    project_id=project.id,
-                    num_tools=safe_int(request.form['tooling_num_tools']),
-                    cost=safe_float(request.form['tooling_cost']),
-                    start_date=safe_date(request.form['tooling_start_date']),
-                    end_date=safe_date(request.form['tooling_end_date']),
-                )
-                db_session.add(tooling)
-                db_session.flush()
-                logger.debug("Tooling object added")
-                tooling.files = save_files(request.files.getlist('tooling_files'), tooling.id, 'tooling')
-            
-            if project.current_stage == 'CONTRACT':
-                production = Production(
-                    project_id=project.id,
-                    start_date=safe_date(request.form['production_start_date']),
-                    end_date=safe_date(request.form['production_end_date']),
-                    cost=safe_float(request.form['production_cost'])
-                )
-                db_session.add(production)
-                production.files = save_files(request.files.getlist('production_files'), production.id, 'production')
-                logger.debug("Production object added")
 
-            if project.current_stage == 'PRODUCTION':
-                packaging = Packaging(
-                    project_id=project.id,
-                    start_date=safe_date(request.form['packaging_start_date']),
-                    end_date=safe_date(request.form['packaging_end_date']),
-                    cost=safe_float(request.form['packaging_cost']),
-                    artist=request.form['packaging_artist']
-                )
-                db_session.add(packaging)
-                packaging.files = save_files(request.files.getlist('packaging_files'), packaging.id, 'packaging')
-                logger.debug("Packaging object added")
+            product_pictures = ProductPictures(
+                project_id=project.id,
+                start_date=safe_date(request.form['product_pictures_start_date']),
+                end_date=safe_date(request.form['product_pictures_end_date']),
+                cost=safe_float(request.form['product_pictures_cost'])
+            )
+            db_session.add(product_pictures)
+            product_pictures.files = save_files(request.files.getlist('product_pictures_files'), product_pictures.id, 'product_pictures')
+            logger.debug("Product Pictures object added")
 
-            if project.current_stage == 'PRODUCTION':
-                launch = Launch(
-                    project_id=project.id,
-                    start_date=safe_date(request.form['launch_start_date']),
-                    end_date=safe_date(request.form['launch_end_date']),
-                    units_sold=safe_int(request.form['units_sold']),
-                    retail_price=safe_float(request.form['retail_price']),
-                    cash_collected=safe_float(request.form['cash_collected']),
-                    commission_paid=safe_float(request.form['commission_paid'])
-                )
-                db_session.add(launch)
-                launch.files = save_files(request.files.getlist('launch_files'), launch.id, 'launch')
-                logger.debug("Launch object added")
 
-            if project.current_stage == 'LAUNCHED':
-                customer_service = CustomerService(
-                    project_id=project.id,
-                    num_breakages=safe_int(request.form['num_breakages']),
-                    num_refunds=safe_int(request.form['num_refunds']),
-                    num_customer_service_messages=safe_int(request.form['num_customer_service_messages'])
-                )
-                db_session.add(customer_service)
-                customer_service.files = save_files(request.files.getlist('customer_service_files'), customer_service.id, 'customer_service')
-                logger.debug("Customer Service object added")
+            contract = Contract(
+                project_id=project.id,
+                sent_date=safe_date(request.form['contract_sent_date']),
+                signed_date=safe_date(request.form['contract_signed_date']),
+            )
+            db_session.add(contract)
+            contract.files = save_files(request.files.getlist('contract_files'), contract.id, 'contract')
+            logger.debug("Contract object added")
 
-            if project.current_stage == 'LAUNCHED':
-                freight = Freight(
-                    project_id=project.id,
-                    freight_type=request.form['freight_type'],
-                    cost=safe_float(request.form['freight_cost']),
-                    size=request.form['freight_size'],
-                    weight=safe_float(request.form['freight_weight']),
-                    start_date=safe_date(request.form['freight_start_date']),
-                    end_date=safe_date(request.form['freight_end_date']),
-                )
-                db_session.add(freight)
-                freight.files = save_files(request.files.getlist('freight_files'), freight.id, 'freight')
-                logger.debug("Freight object added")
 
-            if project.current_stage == 'LAUNCHED':
-                shipping = Shipping(
-                    project_id=project.id,
-                    start_date=safe_date(request.form['shipping_start_date']),
-                    end_date=safe_date(request.form['shipping_end_date']),
-                    avg_price=safe_float(request.form['shipping_avg_price']),
-                    avg_cost=safe_float(request.form['shipping_avg_cost']),
-                    domestic_price=safe_float(request.form['shipping_domestic_price']),
-                    avg_international_price=safe_float(request.form['shipping_avg_international_price']),
-                    avg_international_cost=safe_float(request.form['shipping_avg_international_cost'])
-                )
-                db_session.add(shipping)
-                shipping.files = save_files(request.files.getlist('shipping_files'), shipping.id, 'shipping')
-                logger.debug("Shipping object added")
+            tooling = Tooling(
+                project_id=project.id,
+                num_tools=safe_int(request.form['tooling_num_tools']),
+                cost=safe_float(request.form['tooling_cost']),
+                start_date=safe_date(request.form['tooling_start_date']),
+                end_date=safe_date(request.form['tooling_end_date']),
+            )
+            db_session.add(tooling)
+            db_session.flush()
+            logger.debug("Tooling object added")
+            tooling.files = save_files(request.files.getlist('tooling_files'), tooling.id, 'tooling')
+        
+
+            production = Production(
+                project_id=project.id,
+                start_date=safe_date(request.form['production_start_date']),
+                end_date=safe_date(request.form['production_end_date']),
+                cost=safe_float(request.form['production_cost'])
+            )
+            db_session.add(production)
+            production.files = save_files(request.files.getlist('production_files'), production.id, 'production')
+            logger.debug("Production object added")
+
+
+            packaging = Packaging(
+                project_id=project.id,
+                start_date=safe_date(request.form['packaging_start_date']),
+                end_date=safe_date(request.form['packaging_end_date']),
+                cost=safe_float(request.form['packaging_cost']),
+                artist=request.form['packaging_artist']
+            )
+            db_session.add(packaging)
+            packaging.files = save_files(request.files.getlist('packaging_files'), packaging.id, 'packaging')
+            logger.debug("Packaging object added")
+
+
+            launch = Launch(
+                project_id=project.id,
+                start_date=safe_date(request.form['launch_start_date']),
+                end_date=safe_date(request.form['launch_end_date']),
+                units_sold=safe_int(request.form['units_sold']),
+                retail_price=safe_float(request.form['retail_price']),
+                cash_collected=safe_float(request.form['cash_collected']),
+                commission_paid=safe_float(request.form['commission_paid'])
+            )
+            db_session.add(launch)
+            launch.files = save_files(request.files.getlist('launch_files'), launch.id, 'launch')
+            logger.debug("Launch object added")
+
+
+            customer_service = CustomerService(
+                project_id=project.id,
+                num_breakages=safe_int(request.form['num_breakages']),
+                num_refunds=safe_int(request.form['num_refunds']),
+                num_customer_service_messages=safe_int(request.form['num_customer_service_messages'])
+            )
+            db_session.add(customer_service)
+            customer_service.files = save_files(request.files.getlist('customer_service_files'), customer_service.id, 'customer_service')
+            logger.debug("Customer Service object added")
+
+
+            freight = Freight(
+                project_id=project.id,
+                freight_type=request.form['freight_type'],
+                cost=safe_float(request.form['freight_cost']),
+                size=request.form['freight_size'],
+                weight=safe_float(request.form['freight_weight']),
+                start_date=safe_date(request.form['freight_start_date']),
+                end_date=safe_date(request.form['freight_end_date']),
+            )
+            db_session.add(freight)
+            freight.files = save_files(request.files.getlist('freight_files'), freight.id, 'freight')
+            logger.debug("Freight object added")
+
+
+            shipping = Shipping(
+                project_id=project.id,
+                start_date=safe_date(request.form['shipping_start_date']),
+                end_date=safe_date(request.form['shipping_end_date']),
+                avg_price=safe_float(request.form['shipping_avg_price']),
+                avg_cost=safe_float(request.form['shipping_avg_cost']),
+                domestic_price=safe_float(request.form['shipping_domestic_price']),
+                avg_international_price=safe_float(request.form['shipping_avg_international_price']),
+                avg_international_cost=safe_float(request.form['shipping_avg_international_cost'])
+            )
+            db_session.add(shipping)
+            shipping.files = save_files(request.files.getlist('shipping_files'), shipping.id, 'shipping')
+            logger.debug("Shipping object added")
 
             db_session.commit()
             flash('New project created successfully!', 'success')
@@ -302,6 +322,22 @@ def new_project():
 @app.route('/project/<int:project_id>/edit', methods=['GET', 'POST'])
 def edit_project(project_id):
     project = get_project_or_404(project_id)
+
+    # Explicitly fetch all related objects
+    communication = Communication.query.filter_by(project_id=project_id).first()
+    design = Design.query.filter_by(project_id=project_id).first()
+    modeling = Modeling.query.filter_by(project_id=project_id).first()
+    prototype = Prototype.query.filter_by(project_id=project_id).first()
+    product_pictures = ProductPictures.query.filter_by(project_id=project_id).first()
+    contract = Contract.query.filter_by(project_id=project_id).first()
+    tooling = Tooling.query.filter_by(project_id=project_id).first()
+    production = Production.query.filter_by(project_id=project_id).first()
+    packaging = Packaging.query.filter_by(project_id=project_id).first()
+    launch = Launch.query.filter_by(project_id=project_id).first()
+    customer_service = CustomerService.query.filter_by(project_id=project_id).first()
+    freight = Freight.query.filter_by(project_id=project_id).first()
+    shipping = Shipping.query.filter_by(project_id=project_id).first()
+
     if request.method == 'POST':
         # Update main project details
         project.creator_name = request.form['creator_name']
@@ -313,16 +349,6 @@ def edit_project(project_id):
         project.last_contact_date = safe_date(request.form['last_contact_date']),
         project.last_response_date = safe_date(request.form['last_response_date']),
         project.primary_communication_method = request.form['primary_communication_method']
-        project.launch_type = request.form['launch_type']
-        project.launch_start_date = safe_date(request.form['launch_start_date'])
-        project.launch_end_date = safe_date(request.form['launch_end_date'])
-        project.units_sold =safe_int(request.form['units_sold'])
-        project.retail_price = safe_float(request.form['retail_price'])
-        project.cash_collected = safe_float(request.form['cash_collected'])
-        project.commissions_paid = safe_float(request.form['commissions_paid'])
-        project.num_breakages = safe_int(request.form['num_breakages'])
-        project.num_refunds = safe_int(request.form['num_refunds'])
-        project.num_customer_service_messages = safe_int(request.form['num_customer_service_messages'])
 
         # Update or create related entities
         if project.communication:
@@ -350,7 +376,12 @@ def edit_project(project_id):
         design.start_date = safe_date(request.form['design_start_date'])
         design.end_date = safe_date(request.form['design_end_date'])
         design.cost = safe_float(request.form['design_cost'])
-        design.files.extend(save_files(request.files.getlist('design_files'), design.id, 'design'))
+        design.artist = request.form['design_artist']
+
+        new_files = save_files(request.files.getlist('design_files'), design.id, 'design')
+        for file in new_files:
+            db_session.add(file)
+
 
         if project.modeling:
             modeling = project.modeling
@@ -361,8 +392,12 @@ def edit_project(project_id):
         modeling.start_date = safe_date(request.form['modeling_start_date'])
         modeling.end_date = safe_date(request.form['modeling_end_date'])
         modeling.cost = safe_float(request.form['modeling_cost'])
+        modeling.artist = request.form['modeling_artist']
         modeling.num_exploded_pieces = safe_int(request.form['num_exploded_pieces'])
-        modeling.files.extend(save_files(request.files.getlist('modeling_files'), modeling.id, 'modeling'))
+        
+        new_files = save_files(request.files.getlist('modeling_files'), modeling.id, 'modeling')
+        for file in new_files:
+            db_session.add(file)
 
         if project.prototype:
             prototype = project.prototype
@@ -378,7 +413,9 @@ def edit_project(project_id):
         prototype.dimensions_length = safe_float(request.form['prototype_dimensions_length'])
         prototype.dimensions_depth = safe_float(request.form['prototype_dimensions_depth'])
         prototype.weight = safe_float(request.form['prototype_weight'])
-        prototype.files.extend(save_files(request.files.getlist('prototype_files'), prototype.id, 'prototype'))
+        new_files = save_files(request.files.getlist('prototype_files'), prototype.id, 'prototype')
+        for file in new_files:
+            db_session.add(file)
 
         if project.product_pictures:
             product_pictures = project.product_pictures
@@ -389,7 +426,9 @@ def edit_project(project_id):
         product_pictures.start_date = safe_date(request.form['product_pictures_start_date'])
         product_pictures.end_date = safe_date(request.form['product_pictures_end_date'])
         product_pictures.cost = safe_float(request.form['product_pictures_cost'])
-        product_pictures.files.extend(save_files(request.files.getlist('product_pictures_files'), product_pictures.id, 'product_pictures'))
+        new_files = save_files(request.files.getlist('product_pictures_files'), product_pictures.id, 'product_pictures')
+        for file in new_files:
+            db_session.add(file)
 
         if project.contract:
             contract = project.contract
@@ -399,19 +438,39 @@ def edit_project(project_id):
         
         contract.sent_date = safe_date(request.form['contract_sent_date'])
         contract.signed_date = safe_date(request.form['contract_signed_date'])
-        contract.files.extend(save_files(request.files.getlist('contract_files'), contract.id, 'contract'))
+        new_files = save_files(request.files.getlist('contract_files'), contract.id, 'contract')
+        for file in new_files:
+            db_session.add(file)
 
-        if project.mold:
-            mold = project.mold
+        if project.launch:
+            launch = project.launch
         else:
-            mold = Mold(project_id=project.id)
-            db_session.add(mold)
+            launch = Launch(project_id=project.id)
+            db_session.add(launch)
         
-        mold.num_molds = safe_int(request.form['num_molds'])
-        mold.cost = safe_float(request.form['mold_cost'])
-        mold.start_date = safe_date(request.form['mold_start_date'])
-        mold.end_date = safe_date(request.form['mold_end_date'])
-        mold.files.extend(save_files(request.files.getlist('mold_files'), mold.id, 'mold'))
+        launch.start_date = safe_date(request.form['launch_start_date'])
+        launch.end_date = safe_date(request.form['launch_end_date'])
+        launch.units_sold = safe_int(request.form['units_sold'])
+        launch.retail_price = safe_float(request.form['retail_price'])
+        launch.cash_collected = safe_float(request.form['cash_collected'])
+        launch.commission_paid = safe_float(request.form['commission_paid'])
+        new_files = save_files(request.files.getlist('launch_files'), launch.id, 'launch')
+        for file in new_files:
+            db_session.add(file)
+
+        if project.tooling:
+            tooling = project.tooling
+        else:
+            tooling = Tooling(project_id=project.id)
+            db_session.add(tooling)
+        
+        tooling.num_tools = safe_int(request.form['num_tools'])
+        tooling.cost = safe_float(request.form['tooling_cost'])
+        tooling.start_date = safe_date(request.form['tooling_start_date'])
+        tooling.end_date = safe_date(request.form['tooling_end_date'])
+        new_files = save_files(request.files.getlist('tooling_files'), tooling.id, 'tooling')
+        for file in new_files:
+            db_session.add(file)
 
         if project.production:
             production = project.production
@@ -422,7 +481,9 @@ def edit_project(project_id):
         production.start_date = safe_date(request.form['production_start_date'])
         production.end_date = safe_date(request.form['production_end_date'])
         production.cost = safe_float(request.form['production_cost'])
-        production.files.extend(save_files(request.files.getlist('production_files'), production.id, 'production'))
+        new_files = save_files(request.files.getlist('production_files'), production.id, 'production')
+        for file in new_files:
+            db_session.add(file)
 
         if project.packaging:
             packaging = project.packaging
@@ -433,7 +494,22 @@ def edit_project(project_id):
         packaging.start_date = safe_date(request.form['packaging_start_date'])
         packaging.end_date = safe_date(request.form['packaging_end_date'])
         packaging.cost = safe_float(request.form['packaging_cost'])
-        packaging.files.extend(save_files(request.files.getlist('packaging_files'), packaging.id, 'packaging'))
+        new_files = save_files(request.files.getlist('packaging_files'), packaging.id, 'packaging')
+        for file in new_files:
+            db_session.add(file)
+
+        if project.customer_service:
+            customer_service = project.customer_service
+        else:
+            customer_service = CustomerService(project_id=project.id)
+            db_session.add(customer_service)
+        
+        customer_service.num_breakages = safe_int(request.form['num_breakages'])
+        customer_service.num_refunds = safe_int(request.form['num_refunds'])
+        customer_service.num_customer_service_messages = safe_int(request.form['num_customer_service_messages'])
+        new_files = save_files(request.files.getlist('customer_service_files'), customer_service.id, 'customer_service')
+        for file in new_files:
+            db_session.add(file)
 
         if project.freight:
             freight = project.freight
@@ -447,7 +523,9 @@ def edit_project(project_id):
         freight.weight = safe_float(request.form['freight_weight'])
         freight.start_date = safe_date(request.form['freight_start_date'])
         freight.end_date = safe_date(request.form['freight_end_date'])
-        freight.files.extend(save_files(request.files.getlist('freight_files'), freight.id, 'freight'))
+        new_files = save_files(request.files.getlist('freight_files'), freight.id, 'freight')
+        for file in new_files:
+            db_session.add(file)
 
         if project.shipping:
             shipping = project.shipping
@@ -462,11 +540,27 @@ def edit_project(project_id):
         shipping.domestic_price = safe_float(request.form['shipping_domestic_price'])
         shipping.avg_international_price = safe_float(request.form['shipping_avg_international_price'])
         shipping.avg_international_cost = safe_float(request.form['shipping_avg_international_cost'])
-        shipping.files.extend(save_files(request.files.getlist('shipping_files'), shipping.id, 'shipping'))
+        new_files = save_files(request.files.getlist('shipping_files'), shipping.id, 'shipping')
+        for file in new_files:
+            db_session.add(file)
         
         db_session.commit()
         return redirect(url_for('project_detail', project_id=project.id))
-    return render_template('project_form.html', project=project)
+    return render_template('project_form.html', 
+                           project=project,
+                           communication=communication,
+                           design=design,
+                           modeling=modeling,
+                           prototype=prototype,
+                           product_pictures=product_pictures,
+                           contract=contract,
+                           tooling=tooling,
+                           production=production,
+                           packaging=packaging,
+                           launch=launch,
+                           customer_service=customer_service,
+                           freight=freight,
+                           shipping=shipping)
 
 @app.route('/project/<int:project_id>/delete', methods=['POST'])
 def delete_project(project_id):
