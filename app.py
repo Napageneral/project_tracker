@@ -42,17 +42,29 @@ def get_project_or_404(project_id):
         abort(404, description="Project not found")
     return project
 
-# Helper function to safely convert string to date
 def safe_date(date_string):
-    return safe_date(date_string, '%Y-%m-%d').date() if date_string else None
+    if date_string:
+        try:
+            return datetime.strptime(date_string, '%Y-%m-%d').date()
+        except ValueError:
+            return None
+    return None
 
-# Helper function to safely convert string to float
 def safe_float(float_string):
-    return safe_float(float_string) if float_string else None
+    if float_string:
+        try:
+            return float(float_string)
+        except ValueError:
+            return None
+    return None
 
-# Helper function to safely convert string to int
 def safe_int(int_string):
-    return safe_int(int_string) if int_string else None
+    if int_string:
+        try:
+            return int(int_string)
+        except ValueError:
+            return None
+    return None
 
 @app.before_first_request
 def initialize_database():
@@ -502,4 +514,4 @@ def delete_project(project_id):
         return jsonify({"success": False, "message": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
