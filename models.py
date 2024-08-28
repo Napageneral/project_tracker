@@ -13,16 +13,6 @@ class Project(Base):
     last_contact_date = Column(Date)
     last_response_date = Column(Date)
     primary_communication_method = Column(String(50))
-    launch_type = Column(String(50))
-    launch_start_date = Column(Date)
-    launch_end_date = Column(Date)
-    units_sold = Column(Integer)
-    retail_price = Column(Float)
-    cash_collected = Column(Float)
-    commissions_paid = Column(Float)
-    num_breakages = Column(Integer)
-    num_refunds = Column(Integer)
-    num_customer_service_messages = Column(Integer)
 
     communication = relationship("Communication", back_populates="project")
     design = relationship("Design", back_populates="project")
@@ -30,9 +20,11 @@ class Project(Base):
     prototype = relationship("Prototype", back_populates="project")
     product_pictures = relationship("ProductPictures", back_populates="project")
     contract = relationship("Contract", back_populates="project")
-    mold = relationship("Mold", back_populates="project")
+    tooling = relationship("Tooling", back_populates="project")
+    launch = relationship("Launch", back_populates="project")
     production = relationship("Production", back_populates="project")
     packaging = relationship("Packaging", back_populates="project")
+    customer_service = relationship("CustomerService", back_populates="project")
     freight = relationship("Freight", back_populates="project")
     shipping = relationship("Shipping", back_populates="project")
 
@@ -70,7 +62,6 @@ class Modeling(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     cost = Column(Float)
-    num_exploded_pieces = Column(Integer)
     artist = Column(String(255))
     files = relationship("File", back_populates="modeling")
     project = relationship("Project", back_populates="modeling")
@@ -82,6 +73,7 @@ class Prototype(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     cost = Column(Float)
+    num_exploded_pieces = Column(Integer)
     shipped_date = Column(Date)
     dimensions_height = Column(Float)
     dimensions_length = Column(Float)
@@ -109,16 +101,16 @@ class Contract(Base):
     files = relationship("File", back_populates="contract")
     project = relationship("Project", back_populates="contract")
 
-class Mold(Base):
-    __tablename__ = 'mold'
+class Tooling(Base):
+    __tablename__ = 'tooling'
     id = Column(Integer, primary_key=True)
     project_id = Column(Integer, ForeignKey('projects.id'))
-    num_molds = Column(Integer)
+    num_tools = Column(Integer)
     cost = Column(Float)
     start_date = Column(Date)
     end_date = Column(Date)
-    files = relationship("File", back_populates="mold")
-    project = relationship("Project", back_populates="mold")
+    files = relationship("File", back_populates="tooling")
+    project = relationship("Project", back_populates="tooling")
 
 class Production(Base):
     __tablename__ = 'production'
@@ -130,6 +122,19 @@ class Production(Base):
     files = relationship("File", back_populates="production")
     project = relationship("Project", back_populates="production")
 
+class Launch(Base):
+    __tablename__ = 'launch'
+    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer, ForeignKey('projects.id'))
+    start_date = Column(Date)
+    end_date = Column(Date)
+    units_sold = Column(Integer)
+    retail_price = Column(Float)
+    cash_collected = Column(Float)
+    commission_paid = Column(Float)
+    files = relationship("File", back_populates="launch", cascade="all, delete-orphan")
+    project = relationship("Project", back_populates="launch")
+
 class Packaging(Base):
     __tablename__ = 'packaging'
     id = Column(Integer, primary_key=True)
@@ -137,6 +142,7 @@ class Packaging(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     cost = Column(Float)
+    artist = Column(String(255))
     files = relationship("File", back_populates="packaging")
     project = relationship("Project", back_populates="packaging")
 
@@ -152,6 +158,16 @@ class Freight(Base):
     end_date = Column(Date)
     files = relationship("File", back_populates="freight")
     project = relationship("Project", back_populates="freight")
+
+class CustomerService(Base):
+    __tablename__ = 'customer_service'
+    id = Column(Integer, primary_key=True)
+    project_id = Column(Integer, ForeignKey('projects.id'))
+    num_breakages = Column(Integer)
+    num_refunds = Column(Integer)
+    num_customer_service_messages = Column(Integer)
+    files = relationship("File", back_populates="customer_service")
+    project = relationship("Project", back_populates="customer_service")
 
 class Shipping(Base):
     __tablename__ = 'shipping'
@@ -181,9 +197,11 @@ class File(Base):
     prototype_id = Column(Integer, ForeignKey('prototype.id'))
     product_pictures_id = Column(Integer, ForeignKey('product_pictures.id'))
     contract_id = Column(Integer, ForeignKey('contract.id'))
-    mold_id = Column(Integer, ForeignKey('mold.id'))
+    tooling_id = Column(Integer, ForeignKey('tooling.id'))
+    launch_id = Column(Integer, ForeignKey('launch.id'))
     production_id = Column(Integer, ForeignKey('production.id'))
     packaging_id = Column(Integer, ForeignKey('packaging.id'))
+    customer_service_id = Column(Integer, ForeignKey('customer_service.id'))
     freight_id = Column(Integer, ForeignKey('freight.id'))
     shipping_id = Column(Integer, ForeignKey('shipping.id'))
 
@@ -193,8 +211,10 @@ class File(Base):
     prototype = relationship("Prototype", back_populates="files")
     product_pictures = relationship("ProductPictures", back_populates="files")
     contract = relationship("Contract", back_populates="files")
-    mold = relationship("Mold", back_populates="files")
+    tooling = relationship("Tooling", back_populates="files")
+    launch = relationship("Launch", back_populates="files")
     production = relationship("Production", back_populates="files")
     packaging = relationship("Packaging", back_populates="files")
+    customer_service = relationship("CustomerService", back_populates="files")
     freight = relationship("Freight", back_populates="files")
     shipping = relationship("Shipping", back_populates="files")

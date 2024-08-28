@@ -5,7 +5,7 @@
     <h1 class="mb-4">{% if project %}Edit{% else %}New{% endif %} Project</h1>
     <form method="POST" enctype="multipart/form-data">
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="all">
             <div class="card-header">
                 <h2 class="mb-0">Basic Project Information</h2>
             </div>
@@ -21,8 +21,8 @@
                     </div>
                     <div class="col-md-4">
                         <label for="current_stage" class="form-label">Current Stage</label>
-                        <select class="form-select" id="current_stage" name="current_stage">
-                            {% for stage in ['CONCEPT', 'DESIGN', 'MODELING', 'PROTOTYPE', 'CONTRACT', 'PRODUCTION', 'LAUNCHED', 'COMPLETED', 'CANCELLED'] %}
+                        <select class="form-select" id="current_stage" name="current_stage" required onchange="updateVisibleSections()">
+                            {% for stage in ['CONCEPT', 'DESIGN', 'MODELING', 'PROTOTYPE', 'CONTRACT', 'LAUNCHED', 'PRODUCTION', 'COMPLETED', 'CANCELLED'] %}
                                 <option value="{{ stage }}" {% if project and project.current_stage == stage %}selected{% endif %}>{{ stage }}</option>
                             {% endfor %}
                         </select>
@@ -55,7 +55,7 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="all">
             <div class="card-header">
                 <h2 class="mb-0">Communication</h2>
             </div>
@@ -106,7 +106,7 @@
         </div>
 
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="CONCEPT">
             <div class="card-header">
                 <h2 class="mb-0">Design</h2>
             </div>
@@ -136,7 +136,7 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="MODELING">
             <div class="card-header">
                 <h2 class="mb-0">Modeling</h2>
             </div>
@@ -154,10 +154,6 @@
                         <label for="modeling_cost" class="form-label">Modeling Cost</label>
                         <input type="number" step="0.01" class="form-control" id="modeling_cost" name="modeling_cost" value="{{ project.modeling.cost if project and project.modeling else '' }}">
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="num_exploded_pieces" class="form-label">Exploded Pieces</label>
-                        <input type="number" class="form-control" id="num_exploded_pieces" name="num_exploded_pieces" value="{{ project.modeling.num_exploded_pieces if project and project.modeling else '' }}">
-                    </div>
                     <div class="col-md-6 mb-3">
                         <label for="modeling_artist" class="form-label">3D Modeling Artist</label>
                         <input type="text" class="form-control" id="modeling_artist" name="modeling_artist" value="{{ project.modeling.artist if project and project.modeling else '' }}">
@@ -170,7 +166,7 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="PROTOTYPE">
             <div class="card-header">
                 <h2 class="mb-0">Prototype</h2>
             </div>
@@ -187,6 +183,10 @@
                     <div class="col-md-3 mb-3">
                         <label for="prototype_cost" class="form-label">Prototype Cost</label>
                         <input type="number" step="0.01" class="form-control" id="prototype_cost" name="prototype_cost" value="{{ project.prototype.cost if project and project.prototype else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="num_exploded_pieces" class="form-label">Exploded Pieces</label>
+                        <input type="number" class="form-control" id="num_exploded_pieces" name="num_exploded_pieces" value="{{ project.modeling.num_exploded_pieces if project and project.modeling else '' }}">
                     </div>
                     <div class="col-md-3 mb-3">
                         <label for="prototype_shipped_date" class="form-label">Prototype Shipped</label>
@@ -216,7 +216,7 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="PROTOTYPE">
             <div class="card-header">
                 <h2 class="mb-0">Product Pictures</h2>
             </div>
@@ -242,7 +242,7 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="CONTRACT">
             <div class="card-header">
                 <h2 class="mb-0">Contract</h2>
             </div>
@@ -264,14 +264,14 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="CONTRACT">
             <div class="card-header">
                 <h2 class="mb-0">Tooling</h2>
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-3 mb-3">
-                        <label for="tooling_num_tools" class="form-label">Number of Tools</label>
+                        <label for="num_tools" class="form-label">Number of Tools</label>
                         <input type="number" class="form-control" id="tooling_num_tools" name="tooling_num_tools" value="{{ project.tooling.num_tools if project and project.tooling else '' }}">
                     </div>
                     <div class="col-md-3 mb-3">
@@ -294,7 +294,7 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="CONTRACT">
             <div class="card-header">
                 <h2 class="mb-0">Production</h2>
             </div>
@@ -320,7 +320,7 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="CONTRACT">
             <div class="card-header">
                 <h2 class="mb-0">Packaging</h2>
             </div>
@@ -338,6 +338,10 @@
                         <label for="packaging_cost" class="form-label">Packaging Cost</label>
                         <input type="number" step="0.01" class="form-control" id="packaging_cost" name="packaging_cost" value="{{ project.packaging.cost if project and project.packaging else '' }}">
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="packaging_artist" class="form-label">Packaging Artist</label>
+                        <input type="text" class="form-control" id="packaging_artist" name="packaging_artist" value="{{ project.packaging.artist if project and project.packaging else '' }}">
+                    </div>
                     <div class="col-12 mb-3">
                         <label for="packaging_files" class="form-label">Packaging Files</label>
                         <input type="file" class="form-control" id="packaging_files" name="packaging_files" multiple>
@@ -346,7 +350,71 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="LAUNCHED">
+            <div class="card-header">
+                <h2 class="mb-0">Launch</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="launch_start_date" class="form-label">Launch Start Date</label>
+                        <input type="date" class="form-control" id="launch_start_date" name="launch_start_date" value="{{ project.launch.start_date.isoformat() if project and project.launch and project.launch.start_date else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="launch_end_date" class="form-label">Launch End Date</label>
+                        <input type="date" class="form-control" id="launch_end_date" name="launch_end_date" value="{{ project.launch.end_date.isoformat() if project and project.launch and project.launch.end_date else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="units_sold" class="form-label">Units Sold</label>
+                        <input type="number" class="form-control" id="units_sold" name="units_sold" value="{{ project.launch.units_sold if project and project.launch else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="retail_price" class="form-label">Retail Price</label>
+                        <input type="number" step="0.01" class="form-control" id="retail_price" name="retail_price" value="{{ project.launch.retail_price if project and project.launch else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="cash_collected" class="form-label">Cash Collected</label>
+                        <input type="number" step="0.01" class="form-control" id="cash_collected" name="cash_collected" value="{{ project.launch.cash_collected if project and project.launch else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="commission_paid" class="form-label">Commission Paid</label>
+                        <input type="number" step="0.01" class="form-control" id="commission_paid" name="commission_paid" value="{{ project.launch.commission_paid if project and project.launch else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="launch_files" class="form-label">Launch Files</label>
+                        <input type="file" class="form-control" id="launch_files" name="launch_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4" data-stage="LAUNCHED">
+            <div class="card-header">
+                <h2 class="mb-0">Customer Service</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4 mb-3">
+                        <label for="num_breakages" class="form-label">Number of Breakages</label>
+                        <input type="number" class="form-control" id="num_breakages" name="num_breakages" value="{{ project.customer_service.num_breakages if project and project.customer_service else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="num_refunds" class="form-label">Number of Refunds</label>
+                        <input type="number" class="form-control" id="num_refunds" name="num_refunds" value="{{ project.customer_service.num_refunds if project and project.customer_service else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="num_customer_service_messages" class="form-label">Number of Customer Service Messages</label>
+                        <input type="number" class="form-control" id="num_customer_service_messages" name="num_customer_service_messages" value="{{ project.customer_service.num_customer_service_messages if project and project.customer_service else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="customer_service_files" class="form-label">Customer Service Files</label>
+                        <input type="file" class="form-control" id="customer_service_files" name="customer_service_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4" data-stage="LAUNCHED">
             <div class="card-header">
                 <h2 class="mb-0">Freight</h2>
             </div>
@@ -384,7 +452,7 @@
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" data-stage="LAUNCHED">
             <div class="card-header">
                 <h2 class="mb-0">Shipping Information</h2>
             </div>
@@ -429,5 +497,24 @@
         <button type="submit" class="btn btn-primary mb-4">{% if project %}Update{% else %}Create{% endif %} Project</button>
     </form>
 </div>
+
+<script>
+    function updateVisibleSections() {
+        const currentStage = document.getElementById('current_stage').value;
+        const sections = document.querySelectorAll('.card[data-stage]');
+        
+        sections.forEach(section => {
+            const stages = section.getAttribute('data-stage').split(',');
+            if (stages.includes('all') || stages.includes(currentStage)) {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        });
+    }
+    
+    // Call the function on page load
+    document.addEventListener('DOMContentLoaded', updateVisibleSections);
+</script>
 
 {% endblock %}
