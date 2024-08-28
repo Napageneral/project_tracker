@@ -4,6 +4,7 @@
 <div class="container-fluid">
     <h1 class="mb-4">{% if project %}Edit{% else %}New{% endif %} Project</h1>
     <form method="POST" enctype="multipart/form-data">
+
         <div class="card mb-4">
             <div class="card-header">
                 <h2 class="mb-0">Basic Project Information</h2>
@@ -96,13 +97,337 @@
                         <label for="response_time_min_us" class="form-label">Min Response Time (Us)</label>
                         <input type="number" class="form-control" id="response_time_min_us" name="response_time_min_us" value="{{ project.communication.response_time_min_us if project and project.communication else '' }}">
                     </div>
+                    <div class="col-12 mb-3">
+                        <label for="communication_files" class="form-label">Communication Files</label>
+                        <input type="file" class="form-control" id="communication_files" name="communication_files" multiple>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- We'll continue with other sections in subsequent updates -->
 
-        <button type="submit" class="btn btn-primary">{% if project %}Update{% else %}Create{% endif %} Project</button>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Design</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4 mb-3">
+                        <label for="design_start_date" class="form-label">Design Start</label>
+                        <input type="date" class="form-control" id="design_start_date" name="design_start_date" value="{{ project.design.start_date.isoformat() if project and project.design and project.design.start_date else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="design_end_date" class="form-label">Design End</label>
+                        <input type="date" class="form-control" id="design_end_date" name="design_end_date" value="{{ project.design.end_date.isoformat() if project and project.design and project.design.end_date else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="design_cost" class="form-label">Design Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="design_cost" name="design_cost" value="{{ project.design.cost if project and project.design else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="design_artist" class="form-label">Design Artist</label>
+                        <input type="text" class="form-control" id="design_artist" name="design_artist" value="{{ project.design.artist if project and project.design else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="design_files" class="form-label">Design Files</label>
+                        <input type="file" class="form-control" id="design_files" name="design_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Modeling</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3 mb-3">
+                        <label for="modeling_start_date" class="form-label">Modeling Start</label>
+                        <input type="date" class="form-control" id="modeling_start_date" name="modeling_start_date" value="{{ project.modeling.start_date.isoformat() if project and project.modeling and project.modeling.start_date else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="modeling_end_date" class="form-label">Modeling End</label>
+                        <input type="date" class="form-control" id="modeling_end_date" name="modeling_end_date" value="{{ project.modeling.end_date.isoformat() if project and project.modeling and project.modeling.end_date else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="modeling_cost" class="form-label">Modeling Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="modeling_cost" name="modeling_cost" value="{{ project.modeling.cost if project and project.modeling else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="num_exploded_pieces" class="form-label">Exploded Pieces</label>
+                        <input type="number" class="form-control" id="num_exploded_pieces" name="num_exploded_pieces" value="{{ project.modeling.num_exploded_pieces if project and project.modeling else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="modeling_artist" class="form-label">3D Modeling Artist</label>
+                        <input type="text" class="form-control" id="modeling_artist" name="modeling_artist" value="{{ project.modeling.artist if project and project.modeling else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="modeling_files" class="form-label">Modeling Files</label>
+                        <input type="file" class="form-control" id="modeling_files" name="modeling_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Prototype</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3 mb-3">
+                        <label for="prototype_start_date" class="form-label">Prototype Start</label>
+                        <input type="date" class="form-control" id="prototype_start_date" name="prototype_start_date" value="{{ project.prototype.start_date.isoformat() if project and project.prototype and project.prototype.start_date else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="prototype_end_date" class="form-label">Prototype End</label>
+                        <input type="date" class="form-control" id="prototype_end_date" name="prototype_end_date" value="{{ project.prototype.end_date.isoformat() if project and project.prototype and project.prototype.end_date else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="prototype_cost" class="form-label">Prototype Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="prototype_cost" name="prototype_cost" value="{{ project.prototype.cost if project and project.prototype else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="prototype_shipped_date" class="form-label">Prototype Shipped</label>
+                        <input type="date" class="form-control" id="prototype_shipped_date" name="prototype_shipped_date" value="{{ project.prototype.shipped_date.isoformat() if project and project.prototype and project.prototype.shipped_date else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="prototype_dimensions_height" class="form-label">Height</label>
+                        <input type="number" step="0.01" class="form-control" id="prototype_dimensions_height" name="prototype_dimensions_height" value="{{ project.prototype.dimensions_height if project and project.prototype else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="prototype_dimensions_length" class="form-label">Length</label>
+                        <input type="number" step="0.01" class="form-control" id="prototype_dimensions_length" name="prototype_dimensions_length" value="{{ project.prototype.dimensions_length if project and project.prototype else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="prototype_dimensions_depth" class="form-label">Depth</label>
+                        <input type="number" step="0.01" class="form-control" id="prototype_dimensions_depth" name="prototype_dimensions_depth" value="{{ project.prototype.dimensions_depth if project and project.prototype else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="prototype_weight" class="form-label">Weight</label>
+                        <input type="number" step="0.01" class="form-control" id="prototype_weight" name="prototype_weight" value="{{ project.prototype.weight if project and project.prototype else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="prototype_files" class="form-label">Prototype Files</label>
+                        <input type="file" class="form-control" id="prototype_files" name="prototype_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Product Pictures</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4 mb-3">
+                        <label for="product_pictures_start_date" class="form-label">Pictures Start</label>
+                        <input type="date" class="form-control" id="product_pictures_start_date" name="product_pictures_start_date" value="{{ project.product_pictures.start_date.isoformat() if project and project.product_pictures and project.product_pictures.start_date else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="product_pictures_end_date" class="form-label">Pictures End</label>
+                        <input type="date" class="form-control" id="product_pictures_end_date" name="product_pictures_end_date" value="{{ project.product_pictures.end_date.isoformat() if project and project.product_pictures and project.product_pictures.end_date else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="product_pictures_cost" class="form-label">Pictures Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="product_pictures_cost" name="product_pictures_cost" value="{{ project.product_pictures.cost if project and project.product_pictures else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="product_picture_files" class="form-label">Product Picture Files</label>
+                        <input type="file" class="form-control" id="product_picture_files" name="product_picture_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Contract</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="contract_sent_date" class="form-label">Contract Sent</label>
+                        <input type="date" class="form-control" id="contract_sent_date" name="contract_sent_date" value="{{ project.contract.sent_date.isoformat() if project and project.contract and project.contract.sent_date else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="contract_signed_date" class="form-label">Contract Signed</label>
+                        <input type="date" class="form-control" id="contract_signed_date" name="contract_signed_date" value="{{ project.contract.signed_date.isoformat() if project and project.contract and project.contract.signed_date else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="contract_files" class="form-label">Contract Files</label>
+                        <input type="file" class="form-control" id="contract_files" name="contract_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Tooling</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3 mb-3">
+                        <label for="tooling_num_tools" class="form-label">Number of Tools</label>
+                        <input type="number" class="form-control" id="tooling_num_tools" name="tooling_num_tools" value="{{ project.tooling.num_tools if project and project.tooling else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="tooling_cost" class="form-label">Tooling Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="tooling_cost" name="tooling_cost" value="{{ project.tooling.cost if project and project.tooling else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="tooling_start_date" class="form-label">Tooling Start</label>
+                        <input type="date" class="form-control" id="tooling_start_date" name="tooling_start_date" value="{{ project.tooling.start_date.isoformat() if project and project.tooling and project.tooling.start_date else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="tooling_end_date" class="form-label">Tooling End</label>
+                        <input type="date" class="form-control" id="tooling_end_date" name="tooling_end_date" value="{{ project.tooling.end_date.isoformat() if project and project.tooling and project.tooling.end_date else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="tooling_files" class="form-label">Tooling Files</label>
+                        <input type="file" class="form-control" id="tooling_files" name="tooling_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Production</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4 mb-3">
+                        <label for="production_start_date" class="form-label">Production Start</label>
+                        <input type="date" class="form-control" id="production_start_date" name="production_start_date" value="{{ project.production.start_date.isoformat() if project and project.production and project.production.start_date else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="production_end_date" class="form-label">Production End</label>
+                        <input type="date" class="form-control" id="production_end_date" name="production_end_date" value="{{ project.production.end_date.isoformat() if project and project.production and project.production.end_date else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="production_cost" class="form-label">Production Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="production_cost" name="production_cost" value="{{ project.production.cost if project and project.production else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="production_files" class="form-label">Production Files</label>
+                        <input type="file" class="form-control" id="production_files" name="production_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Packaging</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4 mb-3">
+                        <label for="packaging_start_date" class="form-label">Packaging Start</label>
+                        <input type="date" class="form-control" id="packaging_start_date" name="packaging_start_date" value="{{ project.packaging.start_date.isoformat() if project and project.packaging and project.packaging.start_date else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="packaging_end_date" class="form-label">Packaging End</label>
+                        <input type="date" class="form-control" id="packaging_end_date" name="packaging_end_date" value="{{ project.packaging.end_date.isoformat() if project and project.packaging and project.packaging.end_date else '' }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="packaging_cost" class="form-label">Packaging Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="packaging_cost" name="packaging_cost" value="{{ project.packaging.cost if project and project.packaging else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="packaging_files" class="form-label">Packaging Files</label>
+                        <input type="file" class="form-control" id="packaging_files" name="packaging_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Freight</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3 mb-3">
+                        <label for="freight_type" class="form-label">Freight Type</label>
+                        <input type="text" class="form-control" id="freight_type" name="freight_type" value="{{ project.freight.freight_type if project and project.freight else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="freight_cost" class="form-label">Freight Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="freight_cost" name="freight_cost" value="{{ project.freight.cost if project and project.freight else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="freight_size" class="form-label">Freight Size</label>
+                        <input type="text" class="form-control" id="freight_size" name="freight_size" value="{{ project.freight.size if project and project.freight else '' }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="freight_weight" class="form-label">Freight Weight</label>
+                        <input type="number" step="0.01" class="form-control" id="freight_weight" name="freight_weight" value="{{ project.freight.weight if project and project.freight else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="freight_start_date" class="form-label">Freight Start</label>
+                        <input type="date" class="form-control" id="freight_start_date" name="freight_start_date" value="{{ project.freight.start_date.isoformat() if project and project.freight and project.freight.start_date else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="freight_end_date" class="form-label">Freight End</label>
+                        <input type="date" class="form-control" id="freight_end_date" name="freight_end_date" value="{{ project.freight.end_date.isoformat() if project and project.freight and project.freight.end_date else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="freight_files" class="form-label">Freight Files</label>
+                        <input type="file" class="form-control" id="freight_files" name="freight_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Shipping Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="shipping_start_date" class="form-label">Shipping Start Date</label>
+                        <input type="date" class="form-control" id="shipping_start_date" name="shipping_start_date" value="{{ project.shipping.start_date.isoformat() if project and project.shipping and project.shipping.start_date else '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="shipping_end_date" class="form-label">Shipping End Date</label>
+                        <input type="date" class="form-control" id="shipping_end_date" name="shipping_end_date" value="{{ project.shipping.end_date.isoformat() if project and project.shipping and project.shipping.end_date else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="shipping_avg_price" class="form-label">Average Shipping Price</label>
+                        <input type="number" step="0.01" class="form-control" id="shipping_avg_price" name="shipping_avg_price" value="{{ project.shipping.avg_price if project and project.shipping else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="shipping_avg_cost" class="form-label">Average Shipping Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="shipping_avg_cost" name="shipping_avg_cost" value="{{ project.shipping.avg_cost if project and project.shipping else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="shipping_domestic_price" class="form-label">Domestic Shipping Price</label>
+                        <input type="number" step="0.01" class="form-control" id="shipping_domestic_price" name="shipping_domestic_price" value="{{ project.shipping.domestic_price if project and project.shipping else '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="shipping_avg_international_price" class="form-label">Avg International Shipping Price</label>
+                        <input type="number" step="0.01" class="form-control" id="shipping_avg_international_price" name="shipping_avg_international_price" value="{{ project.shipping.avg_international_price if project and project.shipping else '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="shipping_avg_international_cost" class="form-label">Avg International Shipping Cost</label>
+                        <input type="number" step="0.01" class="form-control" id="shipping_avg_international_cost" name="shipping_avg_international_cost" value="{{ project.shipping.avg_international_cost if project and project.shipping else '' }}">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="shipping_files" class="form-label">Shipping Files</label>
+                        <input type="file" class="form-control" id="shipping_files" name="shipping_files" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-4">{% if project %}Update{% else %}Create{% endif %} Project</button>
     </form>
 </div>
+
 {% endblock %}

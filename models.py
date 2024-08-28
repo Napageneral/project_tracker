@@ -24,18 +24,17 @@ class Project(Base):
     num_refunds = Column(Integer)
     num_customer_service_messages = Column(Integer)
 
-    communication = relationship("Communication", uselist=False, back_populates="project")
-    design = relationship("Design", uselist=False, back_populates="project")
-    modeling = relationship("Modeling", uselist=False, back_populates="project")
-    prototype = relationship("Prototype", uselist=False, back_populates="project")
-    product_pictures = relationship("ProductPictures", uselist=False, back_populates="project")
-    contract = relationship("Contract", uselist=False, back_populates="project")
-    mold = relationship("Mold", uselist=False, back_populates="project")
-    production = relationship("Production", uselist=False, back_populates="project")
-    packaging = relationship("Packaging", uselist=False, back_populates="project")
-    freight = relationship("Freight", uselist=False, back_populates="project")
-    shipping = relationship("Shipping", uselist=False, back_populates="project")
-    attachments = relationship("Attachment", back_populates="project")
+    communication = relationship("Communication", back_populates="project")
+    design = relationship("Design", back_populates="project")
+    modeling = relationship("Modeling", back_populates="project")
+    prototype = relationship("Prototype", back_populates="project")
+    product_pictures = relationship("ProductPictures", back_populates="project")
+    contract = relationship("Contract", back_populates="project")
+    mold = relationship("Mold", back_populates="project")
+    production = relationship("Production", back_populates="project")
+    packaging = relationship("Packaging", back_populates="project")
+    freight = relationship("Freight", back_populates="project")
+    shipping = relationship("Shipping", back_populates="project")
 
 class Communication(Base):
     __tablename__ = 'communication'
@@ -50,6 +49,7 @@ class Communication(Base):
     response_time_max_us = Column(Integer)
     response_time_avg_us = Column(Integer)
     response_time_min_us = Column(Integer)
+    files = relationship("File", back_populates="communication")
     project = relationship("Project", back_populates="communication")
 
 class Design(Base):
@@ -59,6 +59,8 @@ class Design(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     cost = Column(Float)
+    artist = Column(String(255))
+    files = relationship("File", back_populates="design")
     project = relationship("Project", back_populates="design")
 
 class Modeling(Base):
@@ -69,6 +71,8 @@ class Modeling(Base):
     end_date = Column(Date)
     cost = Column(Float)
     num_exploded_pieces = Column(Integer)
+    artist = Column(String(255))
+    files = relationship("File", back_populates="modeling")
     project = relationship("Project", back_populates="modeling")
 
 class Prototype(Base):
@@ -83,6 +87,7 @@ class Prototype(Base):
     dimensions_length = Column(Float)
     dimensions_depth = Column(Float)
     weight = Column(Float)
+    files = relationship("File", back_populates="prototype")
     project = relationship("Project", back_populates="prototype")
 
 class ProductPictures(Base):
@@ -92,6 +97,7 @@ class ProductPictures(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     cost = Column(Float)
+    files = relationship("File", back_populates="product_pictures")
     project = relationship("Project", back_populates="product_pictures")
 
 class Contract(Base):
@@ -100,6 +106,7 @@ class Contract(Base):
     project_id = Column(Integer, ForeignKey('projects.id'))
     sent_date = Column(Date)
     signed_date = Column(Date)
+    files = relationship("File", back_populates="contract")
     project = relationship("Project", back_populates="contract")
 
 class Mold(Base):
@@ -110,6 +117,7 @@ class Mold(Base):
     cost = Column(Float)
     start_date = Column(Date)
     end_date = Column(Date)
+    files = relationship("File", back_populates="mold")
     project = relationship("Project", back_populates="mold")
 
 class Production(Base):
@@ -119,6 +127,7 @@ class Production(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     cost = Column(Float)
+    files = relationship("File", back_populates="production")
     project = relationship("Project", back_populates="production")
 
 class Packaging(Base):
@@ -128,6 +137,7 @@ class Packaging(Base):
     start_date = Column(Date)
     end_date = Column(Date)
     cost = Column(Float)
+    files = relationship("File", back_populates="packaging")
     project = relationship("Project", back_populates="packaging")
 
 class Freight(Base):
@@ -140,6 +150,7 @@ class Freight(Base):
     weight = Column(Float)
     start_date = Column(Date)
     end_date = Column(Date)
+    files = relationship("File", back_populates="freight")
     project = relationship("Project", back_populates="freight")
 
 class Shipping(Base):
@@ -153,19 +164,37 @@ class Shipping(Base):
     domestic_price = Column(Float)
     avg_international_price = Column(Float)
     avg_international_cost = Column(Float)
+    files = relationship("File", back_populates="shipping")
     project = relationship("Project", back_populates="shipping")
-
-class Attachment(Base):
-    __tablename__ = 'attachments'
+    
+class File(Base):
+    __tablename__ = 'files'
     id = Column(Integer, primary_key=True)
-    project_id = Column(Integer, ForeignKey('projects.id'))
-    attachment_type = Column(Enum('CREATOR_LOGO', 'CONCEPT_IMAGE', 'DESIGN_IMAGE', '3D_MODEL_IMAGE', '3D_MODEL_LINK', 
-                                  'PROTOTYPE_QUOTE', 'PROTOTYPE_IMAGE', 'EXPLODED_PROTOTYPE_IMAGE', 'PRODUCT_IMAGE', 
-                                  'MOLD_QUOTE', 'PRODUCTION_QUOTE', 'CONTRACT', 'LAUNCH_VIDEO', 'OTHER'), nullable=False)
-    file_name = Column(String(255))
-    file_path = Column(String(255))
+    filename = Column(String(255), nullable=False)
+    file_path = Column(String(255), nullable=False)
+    upload_date = Column(DateTime, nullable=False)
     file_type = Column(String(50))
-    url = Column(String(255))
-    description = Column(Text)
-    upload_date = Column(DateTime)
-    project = relationship("Project", back_populates="attachments")
+    
+    communication_id = Column(Integer, ForeignKey('communication.id'))
+    design_id = Column(Integer, ForeignKey('design.id'))
+    modeling_id = Column(Integer, ForeignKey('modeling.id'))
+    prototype_id = Column(Integer, ForeignKey('prototype.id'))
+    product_pictures_id = Column(Integer, ForeignKey('product_pictures.id'))
+    contract_id = Column(Integer, ForeignKey('contract.id'))
+    mold_id = Column(Integer, ForeignKey('mold.id'))
+    production_id = Column(Integer, ForeignKey('production.id'))
+    packaging_id = Column(Integer, ForeignKey('packaging.id'))
+    freight_id = Column(Integer, ForeignKey('freight.id'))
+    shipping_id = Column(Integer, ForeignKey('shipping.id'))
+
+    communication = relationship("Communication", back_populates="files")
+    design = relationship("Design", back_populates="files")
+    modeling = relationship("Modeling", back_populates="files")
+    prototype = relationship("Prototype", back_populates="files")
+    product_pictures = relationship("ProductPictures", back_populates="files")
+    contract = relationship("Contract", back_populates="files")
+    mold = relationship("Mold", back_populates="files")
+    production = relationship("Production", back_populates="files")
+    packaging = relationship("Packaging", back_populates="files")
+    freight = relationship("Freight", back_populates="files")
+    shipping = relationship("Shipping", back_populates="files")
