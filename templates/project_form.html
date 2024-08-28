@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">{% if project %}Edit{% else %}New{% endif %} Project</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Basic Project Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="creator_name" class="form-label">Creator Name</label>
+                        <input type="text" class="form-control" id="creator_name" name="creator_name" value="{{ project.creator_name if project else '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="project_name" class="form-label">Project Name</label>
+                        <input type="text" class="form-control" id="project_name" name="project_name" value="{{ project.project_name if project else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="current_stage" class="form-label">Current Stage</label>
+                        <select class="form-select" id="current_stage" name="current_stage">
+                            {% for stage in ['CONCEPT', 'DESIGN', 'MODELING', 'PROTOTYPE', 'CONTRACT', 'PRODUCTION', 'LAUNCHED', 'COMPLETED', 'CANCELLED'] %}
+                                <option value="{{ stage }}" {% if project and project.current_stage == stage %}selected{% endif %}>{{ stage }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="first_contact_date" class="form-label">First Contact Date</label>
+                        <input type="date" class="form-control" id="first_contact_date" name="first_contact_date" value="{{ project.first_contact_date.isoformat() if project and project.first_contact_date else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="first_response_date" class="form-label">First Response Date</label>
+                        <input type="date" class="form-control" id="first_response_date" name="first_response_date" value="{{ project.first_response_date.isoformat() if project and project.first_response_date else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="last_contact_date" class="form-label">Last Contact Date</label>
+                        <input type="date" class="form-control" id="last_contact_date" name="last_contact_date" value="{{ project.last_contact_date.isoformat() if project and project.last_contact_date else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="last_response_date" class="form-label">Last Response Date</label>
+                        <input type="date" class="form-control" id="last_response_date" name="last_response_date" value="{{ project.last_response_date.isoformat() if project and project.last_response_date else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="primary_communication_method" class="form-label">Primary Communication Method</label>
+                        <input type="text" class="form-control" id="primary_communication_method" name="primary_communication_method" value="{{ project.primary_communication_method if project else '' }}">
+                    </div>
+                    <div class="col-12">
+                        <label for="creator_logo" class="form-label">Creator Logo</label>
+                        <input type="file" class="form-control" id="creator_logo" name="creator_logo" accept="image/*">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="mb-0">Communication</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="num_phone_calls" class="form-label">Number of Phone Calls</label>
+                        <input type="number" class="form-control" id="num_phone_calls" name="num_phone_calls" value="{{ project.communication.num_phone_calls if project and project.communication else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="num_messages_client" class="form-label">Messages from Client</label>
+                        <input type="number" class="form-control" id="num_messages_client" name="num_messages_client" value="{{ project.communication.num_messages_client if project and project.communication else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="num_messages_us" class="form-label">Messages from Us</label>
+                        <input type="number" class="form-control" id="num_messages_us" name="num_messages_us" value="{{ project.communication.num_messages_us if project and project.communication else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="response_time_max_client" class="form-label">Max Response Time (Client)</label>
+                        <input type="number" class="form-control" id="response_time_max_client" name="response_time_max_client" value="{{ project.communication.response_time_max_client if project and project.communication else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="response_time_avg_client" class="form-label">Avg Response Time (Client)</label>
+                        <input type="number" class="form-control" id="response_time_avg_client" name="response_time_avg_client" value="{{ project.communication.response_time_avg_client if project and project.communication else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="response_time_min_client" class="form-label">Min Response Time (Client)</label>
+                        <input type="number" class="form-control" id="response_time_min_client" name="response_time_min_client" value="{{ project.communication.response_time_min_client if project and project.communication else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="response_time_max_us" class="form-label">Max Response Time (Us)</label>
+                        <input type="number" class="form-control" id="response_time_max_us" name="response_time_max_us" value="{{ project.communication.response_time_max_us if project and project.communication else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="response_time_avg_us" class="form-label">Avg Response Time (Us)</label>
+                        <input type="number" class="form-control" id="response_time_avg_us" name="response_time_avg_us" value="{{ project.communication.response_time_avg_us if project and project.communication else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="response_time_min_us" class="form-label">Min Response Time (Us)</label>
+                        <input type="number" class="form-control" id="response_time_min_us" name="response_time_min_us" value="{{ project.communication.response_time_min_us if project and project.communication else '' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- We'll continue with other sections in subsequent updates -->
+
+        <button type="submit" class="btn btn-primary">{% if project %}Update{% else %}Create{% endif %} Project</button>
+    </form>
+</div>
+{% endblock %}
