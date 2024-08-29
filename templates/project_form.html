@@ -383,7 +383,6 @@
                     <div class="col-md-6 mb-3">
                         <label for="commission_paid" class="form-label">Commission Paid</label>
                         <input type="number" step="0.01" class="form-control" id="commission_paid" name="commission_paid" value="{{ launch.commission_paid if launch else '' }}">
-                        <input type="number" step="0.01" class="form-control" id="commission_paid" name="commission_paid" value="{{ project.launch.commission_paid if project and project.launch else '' }}">
                     </div>
                     <div class="col-12 mb-3">
                         <label for="launch_files" class="form-label">Launch Files</label>
@@ -427,27 +426,27 @@
                 <div class="row g-3">
                     <div class="col-md-3 mb-3">
                         <label for="freight_type" class="form-label">Freight Type</label>
-                        <input type="text" class="form-control" id="freight_type" name="freight_type" value="{{ project.freight.freight_type if project and project.freight else '' }}">
+                        <input type="text" class="form-control" id="freight_type" name="freight_type" value="{{ freight.freight_type if freight else '' }}">
                     </div>
                     <div class="col-md-3 mb-3">
                         <label for="freight_cost" class="form-label">Freight Cost</label>
-                        <input type="number" step="0.01" class="form-control" id="freight_cost" name="freight_cost" value="{{ project.freight.cost if project and project.freight else '' }}">
+                        <input type="number" step="0.01" class="form-control" id="freight_cost" name="freight_cost" value="{{ freight.cost if freight else '' }}">
                     </div>
                     <div class="col-md-3 mb-3">
                         <label for="freight_size" class="form-label">Freight Size</label>
-                        <input type="text" class="form-control" id="freight_size" name="freight_size" value="{{ project.freight.size if project and project.freight else '' }}">
+                        <input type="text" class="form-control" id="freight_size" name="freight_size" value="{{ freight.size if freight else '' }}">
                     </div>
                     <div class="col-md-3 mb-3">
                         <label for="freight_weight" class="form-label">Freight Weight</label>
-                        <input type="number" step="0.01" class="form-control" id="freight_weight" name="freight_weight" value="{{ project.freight.weight if project and project.freight else '' }}">
+                        <input type="number" step="0.01" class="form-control" id="freight_weight" name="freight_weight" value="{{ freight.weight if freight else '' }}">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="freight_start_date" class="form-label">Freight Start</label>
-                        <input type="date" class="form-control" id="freight_start_date" name="freight_start_date" value="{{ project.freight.start_date.isoformat() if project and project.freight and project.freight.start_date else '' }}">
+                        <input type="date" class="form-control" id="freight_start_date" name="freight_start_date" value="{{ freight.start_date.isoformat() if freight and freight.start_date else '' }}">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="freight_end_date" class="form-label">Freight End</label>
-                        <input type="date" class="form-control" id="freight_end_date" name="freight_end_date" value="{{ project.freight.end_date.isoformat() if project and project.freight and project.freight.end_date else '' }}">
+                        <input type="date" class="form-control" id="freight_end_date" name="freight_end_date" value="{{ freight.end_date.isoformat() if freight and freight.end_date else '' }}">
                     </div>
                     <div class="col-12 mb-3">
                         <label for="freight_files" class="form-label">Freight Files</label>
@@ -465,31 +464,31 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="shipping_start_date" class="form-label">Shipping Start Date</label>
-                        <input type="date" class="form-control" id="shipping_start_date" name="shipping_start_date" value="{{ project.shipping.start_date.isoformat() if project and project.shipping and project.shipping.start_date else '' }}">
+                        <input type="date" class="form-control" id="shipping_start_date" name="shipping_start_date" value="{{ shipping.start_date.isoformat() if shipping and shipping.start_date else '' }}">
                     </div>
                     <div class="col-md-6">
                         <label for="shipping_end_date" class="form-label">Shipping End Date</label>
-                        <input type="date" class="form-control" id="shipping_end_date" name="shipping_end_date" value="{{ project.shipping.end_date.isoformat() if project and project.shipping and project.shipping.end_date else '' }}">
+                        <input type="date" class="form-control" id="shipping_end_date" name="shipping_end_date" value="{{ shipping.end_date.isoformat() if shipping and shipping.end_date else '' }}">
                     </div>
                     <div class="col-md-4">
                         <label for="shipping_avg_price" class="form-label">Average Shipping Price</label>
-                        <input type="number" step="0.01" class="form-control" id="shipping_avg_price" name="shipping_avg_price" value="{{ project.shipping.avg_price if project and project.shipping else '' }}">
+                        <input type="number" step="0.01" class="form-control" id="shipping_avg_price" name="shipping_avg_price" value="{{ shipping.avg_price if shipping else '' }}">
                     </div>
                     <div class="col-md-4">
                         <label for="shipping_avg_cost" class="form-label">Average Shipping Cost</label>
-                        <input type="number" step="0.01" class="form-control" id="shipping_avg_cost" name="shipping_avg_cost" value="{{ project.shipping.avg_cost if project and project.shipping else '' }}">
+                        <input type="number" step="0.01" class="form-control" id="shipping_avg_cost" name="shipping_avg_cost" value="{{ shipping.avg_cost if shipping else '' }}">
                     </div>
                     <div class="col-md-4">
                         <label for="shipping_domestic_price" class="form-label">Domestic Shipping Price</label>
-                        <input type="number" step="0.01" class="form-control" id="shipping_domestic_price" name="shipping_domestic_price" value="{{ project.shipping.domestic_price if project and project.shipping else '' }}">
+                        <input type="number" step="0.01" class="form-control" id="shipping_domestic_price" name="shipping_domestic_price" value="{{ shipping.domestic_price if shipping else '' }}">
                     </div>
                     <div class="col-md-6">
                         <label for="shipping_avg_international_price" class="form-label">Avg International Shipping Price</label>
-                        <input type="number" step="0.01" class="form-control" id="shipping_avg_international_price" name="shipping_avg_international_price" value="{{ project.shipping.avg_international_price if project and project.shipping else '' }}">
+                        <input type="number" step="0.01" class="form-control" id="shipping_avg_international_price" name="shipping_avg_international_price" value="{{ shipping.avg_international_price if shipping else '' }}">
                     </div>
                     <div class="col-md-6">
                         <label for="shipping_avg_international_cost" class="form-label">Avg International Shipping Cost</label>
-                        <input type="number" step="0.01" class="form-control" id="shipping_avg_international_cost" name="shipping_avg_international_cost" value="{{ project.shipping.avg_international_cost if project and project.shipping else '' }}">
+                        <input type="number" step="0.01" class="form-control" id="shipping_avg_international_cost" name="shipping_avg_international_cost" value="{{ shipping.avg_international_cost if shipping else '' }}">
                     </div>
                     <div class="col-12 mb-3">
                         <label for="shipping_files" class="form-label">Shipping Files</label>
